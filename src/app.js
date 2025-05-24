@@ -34,6 +34,28 @@ app.get("/feed", async (req, res) => {
   }
 });
 
+app.delete("/user", async (req, res) => {
+  const userId = req.body._id;
+  try {
+    await User.findByIdAndDelete(userId);
+    res.send("User deleted successfully");
+  } catch (err) {
+    res.status(500).send("Something went wrong");
+  }
+});
+
+app.patch("/user", async (req, res) => {
+  const userId = req.body._id;
+  const data = req.body;
+  console.log(data);
+  try {
+    const user = await User.findByIdAndUpdate(userId, data);
+    res.send("User updated successfully");
+  } catch (err) {
+    res.send("Something went wrong");
+  }
+});
+
 app.post("/signup", async (req, res) => {
   const userData = req.body; //Here we are getting the data from the request body trough postman api
   console.log(userData);
