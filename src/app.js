@@ -47,9 +47,11 @@ app.delete("/user", async (req, res) => {
 app.patch("/user", async (req, res) => {
   const userId = req.body._id;
   const data = req.body;
-  console.log(data);
+  // console.log(data);
   try {
-    const user = await User.findByIdAndUpdate(userId, data);
+    const user = await User.findByIdAndUpdate(userId, data, {
+      runValidators: true,
+    });
     res.send("User updated successfully");
   } catch (err) {
     res.send("Something went wrong");
@@ -58,7 +60,7 @@ app.patch("/user", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   const userData = req.body; //Here we are getting the data from the request body trough postman api
-  console.log(userData);
+  // console.log(userData);
 
   try {
     const user = new User(userData);
