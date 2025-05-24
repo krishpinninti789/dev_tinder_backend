@@ -6,6 +6,34 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/user", async (req, res) => {
+  try {
+    const emailId = req.body.email;
+    const user = await User.find({ email: emailId });
+
+    if (user.length === 0) {
+      res.status(404).send("User not found");
+    } else {
+      res.send(user);
+    }
+  } catch (err) {
+    res.send(500).send("Something went wrong");
+  }
+});
+
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find({});
+    if (users.length === 0) {
+      res.status(404).send("No users found");
+    } else {
+      res.send(users);
+    }
+  } catch (err) {
+    res.status(500).send("Something went wrong");
+  }
+});
+
 app.post("/signup", async (req, res) => {
   const userData = req.body; //Here we are getting the data from the request body trough postman api
   console.log(userData);
