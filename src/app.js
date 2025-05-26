@@ -4,10 +4,12 @@ const User = require("./models/Users");
 const validateReq = require("./utils/validator");
 const bcrypt = require("bcrypt");
 const Users = require("./models/Users");
+const cookieparser = require("cookie-parser");
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieparser());
 
 app.get("/user", async (req, res) => {
   try {
@@ -24,6 +26,21 @@ app.get("/user", async (req, res) => {
   }
 });
 
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    const { auth } = cookies;
+
+    console.log(auth);
+    if (!auth) {
+      return res.status(401).send("Unauthorized access");
+    }
+    res.send("Profile page accessed successfully");
+  } catch (err) {
+    res.send("Something went wrong");
+  }
+});
+
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -37,6 +54,8 @@ app.post("/login", async (req, res) => {
     if (!ispass) {
       throw new Error("Invalid credentials");
     } else {
+      const Token = "wdfetrnrgdiwsadfgtorefdvgtr";
+      res.cookie("auth", Token);
       res.send("Login successfull!!!!");
     }
   } catch (err) {
