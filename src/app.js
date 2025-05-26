@@ -1,6 +1,8 @@
 const express = require("express");
 const connectToDB = require("./config/db");
 const User = require("./models/Users");
+const validateReq = require("./utils/validator");
+const bcrypt = require("bcrypt");
 
 const app = express();
 
@@ -71,13 +73,28 @@ app.post("/signup", async (req, res) => {
   const userData = req.body; //Here we are getting the data from the request body trough postman api
   // console.log(userData);
 
+  const { firstName, lastName, email, password, gender, age } = req.body;
+
+  validateReq(req);
+
   try {
-    const user = new User(userData);
+    //hash the password
+    const hashedpassword = await bcrypt.hash(password, 10);
+    console.log(hashedpassword);
+
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password: hashedpassword,
+      gender,
+      age,
+    });
     await user.save().then((result) => {
       res.send("User created successfully");
     });
   } catch (err) {
-    res.status(400).send("Error saving the user");
+    res.status(400).send("Error : " + err);
   }
 });
 
