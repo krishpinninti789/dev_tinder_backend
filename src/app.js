@@ -51,10 +51,8 @@ app.post("/login", async (req, res) => {
     if (!ispass) {
       throw new Error("Invalid credentials");
     } else {
-      const jtoken = await jwt.sign({ _id: user._id }, "DevTinder@123", {
-        expiresIn: "1h",
-      });
-      console.log(jtoken);
+      const jtoken = await user.getJWT();
+      // console.log(jtoken);
 
       // const token = "wdfetrnrgdiwsadfgtorefdvgtr";
       res.cookie("auth", jtoken);
