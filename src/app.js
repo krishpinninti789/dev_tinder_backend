@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const Users = require("./models/Users");
 const cookieparser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const adminAuth = require("./middleware/auth/admin");
 
 const app = express();
 
@@ -27,22 +28,11 @@ app.get("/user", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", adminAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    const { auth } = cookies;
+    const userData = req.user;
 
-    // console.log(auth);
-    if (!auth) {
-      return res.status(401).send("Unauthorized access");
-    }
-    res.send("Profile page accessed successfully");
-
-    const decodedMessage = jwt.verify(auth, "DevTinder@123");
-    console.log(decodedMessage);
-    const { _id } = decodedMessage;
-    const prof = await User.find({ _id: _id });
-    console.log(prof);
+    res.send(userData);
   } catch (err) {
     res.send("Something went wrong");
   }
@@ -61,10 +51,12 @@ app.post("/login", async (req, res) => {
     if (!ispass) {
       throw new Error("Invalid credentials");
     } else {
-      const jtoken = await jwt.sign({ _id: user._id }, "DevTinder@123");
+      const jtoken = await jwt.sign({ _id: user._id }, "DevTinder@123", {
+        expiresIn: "1h",
+      });
       console.log(jtoken);
 
-      const token = "wdfetrnrgdiwsadfgtorefdvgtr";
+      // const token = "wdfetrnrgdiwsadfgtorefdvgtr";
       res.cookie("auth", jtoken);
       res.send("Login successfull!!!!");
     }
@@ -73,7 +65,15 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/feed", async (req, res) => {
+app.post("/sendConnectionRequest", adminAuth, (req, res) => {
+  try {
+    res.send("Connection request sent successfully");
+  } catch (err) {
+    res.status(500).send("Error : " + err);
+  }
+});
+
+app.get("/feed", adminAuth, async (req, res) => {
   try {
     const users = await User.find({});
     if (users.length === 0) {
