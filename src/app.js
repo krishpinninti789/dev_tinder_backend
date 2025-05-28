@@ -5,6 +5,7 @@ const validateReq = require("./utils/validator");
 const bcrypt = require("bcrypt");
 const Users = require("./models/Users");
 const cookieparser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -31,11 +32,17 @@ app.get("/profile", async (req, res) => {
     const cookies = req.cookies;
     const { auth } = cookies;
 
-    console.log(auth);
+    // console.log(auth);
     if (!auth) {
       return res.status(401).send("Unauthorized access");
     }
     res.send("Profile page accessed successfully");
+
+    const decodedMessage = jwt.verify(auth, "DevTinder@123");
+    console.log(decodedMessage);
+    const { _id } = decodedMessage;
+    const prof = await User.find({ _id: _id });
+    console.log(prof);
   } catch (err) {
     res.send("Something went wrong");
   }
@@ -54,8 +61,11 @@ app.post("/login", async (req, res) => {
     if (!ispass) {
       throw new Error("Invalid credentials");
     } else {
-      const Token = "wdfetrnrgdiwsadfgtorefdvgtr";
-      res.cookie("auth", Token);
+      const jtoken = await jwt.sign({ _id: user._id }, "DevTinder@123");
+      console.log(jtoken);
+
+      const token = "wdfetrnrgdiwsadfgtorefdvgtr";
+      res.cookie("auth", jtoken);
       res.send("Login successfull!!!!");
     }
   } catch (err) {
