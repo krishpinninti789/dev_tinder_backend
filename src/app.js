@@ -46,9 +46,9 @@ app.post("/login", async (req, res) => {
       throw new Error("Invalid credentials");
     }
 
-    const ispass = await bcrypt.compare(password, user.password);
+    const ispasswordValid = await user.isValidPassword(user.password);
 
-    if (!ispass) {
+    if (!ispasswordValid) {
       throw new Error("Invalid credentials");
     } else {
       const jtoken = await user.getJWT();

@@ -47,6 +47,7 @@ const UserSchema = new mongoose.Schema({
       }
     },
   },
+
   bio: {
     type: String,
     default: "This default bio",
@@ -59,10 +60,11 @@ UserSchema.methods.getJWT = async function () {
   return token;
 };
 
-// UserSchema.methods.isPassword = async function () {
-//   const user = this;
-//   const pass = await bcrypt.compare(user.password, );
-//   return pass;
-// };
+UserSchema.methods.isValidPassword = async function (passwordInput) {
+  const user = this;
+  const passwordHash = user.password;
+  const pass = await bcrypt.compare(passwordInput, passwordHash);
+  return pass;
+};
 
 module.exports = mongoose.model("User", UserSchema);
