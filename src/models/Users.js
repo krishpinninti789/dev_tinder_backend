@@ -61,10 +61,10 @@ UserSchema.methods.getJWT = async function () {
   return token;
 };
 
-UserSchema.methods.isValidPassword = async function (passwordInput) {
+UserSchema.methods.isValidPassword = async function (passwordInputByUser) {
   const user = this;
   const passwordHash = user.password;
-  const pass = await bcrypt.compare(passwordInput, passwordHash);
+  const pass = await bcrypt.compare(passwordInputByUser, passwordHash);
   return pass;
 };
 
