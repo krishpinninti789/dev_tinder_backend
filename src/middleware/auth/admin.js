@@ -5,7 +5,7 @@ const adminAuth = async (req, res, next) => {
   try {
     const { auth } = req.cookies;
     if (!auth) {
-      res.send("Token not valid!!!");
+      res.status(400).send("Token not valid!!!");
     }
     const decodedMessage = await jwt.verify(auth, "DevTinder@123");
     const { _id } = decodedMessage;

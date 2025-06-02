@@ -9,7 +9,7 @@ profileRouter.get("/profile", adminAuth, async (req, res) => {
 
     res.send(userData);
   } catch (err) {
-    res.send("Something went wrong");
+    res.status(400).send("Something went wrong");
   }
 });
 
