@@ -1,9 +1,10 @@
 const User = require("../models/Users");
-const adminAuth = require("../middleware/auth/admin");
+const userAuth = require("../middleware/auth/admin");
 const express = require("express");
+const { validateEditProfileData } = require("../utils/validator");
 const profileRouter = express.Router();
 
-profileRouter.get("/profile", adminAuth, async (req, res) => {
+profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
     const userData = req.user;
 
@@ -13,30 +14,21 @@ profileRouter.get("/profile", adminAuth, async (req, res) => {
   }
 });
 
-profileRouter.patch("/user", async (req, res) => {
-  const userId = req.body._id;
-  const data = req.body;
-
-  // console.log(data);
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
-    const ALLOWED = [, "_id", "skills", "age", "bio", "gender"];
-
-    const isAllowUpdate = Object.keys(data).every((k) => ALLOWED.includes(k));
-
-    if (!isAllowUpdate) {
-      res.status(500).send("Not Allowed to update");
-    } else {
-      const user = await User.findByIdAndUpdate(userId, data, {
-        runValidators: true,
-      });
-      res.send("User updated successfully");
+    if (!validateEditProfileData(req)) {
+      throw new Error("Unable to update the profile!!");
     }
+    const loggedInUser = req.user;
+    Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
+    loggedInUser.save();
+    res.send(`${loggedInUser.firstName},your profile has updated.`);
   } catch (err) {
-    res.send("Something went wrong");
+    res.status(404).send("ERROR : " + err);
   }
 });
 
-profileRouter.get("/feed", adminAuth, async (req, res) => {
+profileRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const users = await User.find({});
     if (users.length === 0) {

@@ -1,7 +1,7 @@
 const Users = require("../../models/Users");
 const jwt = require("jsonwebtoken");
 
-const adminAuth = async (req, res, next) => {
+const userAuth = async (req, res, next) => {
   try {
     const { auth } = req.cookies;
     if (!auth) {
@@ -21,4 +21,4 @@ const adminAuth = async (req, res, next) => {
   }
 };
 
-module.exports = adminAuth;
+module.exports = userAuth;
