@@ -1,8 +1,10 @@
 const User = require("../models/Users");
 const userAuth = require("../middleware/auth/admin");
 const express = require("express");
+const validator = require("validator");
 const { validateEditProfileData } = require("../utils/validator");
 const profileRouter = express.Router();
+const bcrypt = require("bcrypt");
 
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
@@ -38,6 +40,34 @@ profileRouter.get("/feed", userAuth, async (req, res) => {
     }
   } catch (err) {
     res.status(500).send("Something went wrong");
+  }
+});
+
+profileRouter.patch("/profile/forgetPassword", async (req, res) => {
+  try {
+    const { emailId, passwordInputByUser } = req.body;
+    const user = await User.findOne({ email: emailId });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const isOldPasswordMatch = await bcrypt.compare(
+      passwordInputByUser,
+      user.password
+    );
+    if (isOldPasswordMatch) {
+      res.status(400).send("Password should not match recent passwords!!!");
+    }
+    const isPasswordStrong = validator.isStrongPassword(passwordInputByUser);
+    if (!isPasswordStrong) {
+      res.send("Password is not strong ,please enter strong password!!!");
+    }
+    const passwordHash = await bcrypt.hash(passwordInputByUser, 10);
+    user.password = passwordHash;
+    user.save();
+    res.send("Password changed successfully!!!");
+  } catch (err) {
+    res.status(400).send("ERROR : " + err);
   }
 });
 
