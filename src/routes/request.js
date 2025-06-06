@@ -1,6 +1,7 @@
 const userAuth = require("../middleware/auth/admin");
 const express = require("express");
 const ConnectionRequest = require("../models/ConnectionRequest");
+const Users = require("../models/Users");
 const requestRouter = express.Router();
 
 requestRouter.post("/request/send/:status/:id", userAuth, async (req, res) => {
@@ -10,6 +11,12 @@ requestRouter.post("/request/send/:status/:id", userAuth, async (req, res) => {
 
     const status = req.params.status;
 
+    const isToUserIdValid = await Users.find({ _id: toUserId });
+
+    if (isToUserIdValid.length <= 0) {
+      return res.status(400).send("User id is not valid");
+    }
+
     const existingConnectionRequest = await ConnectionRequest.findOne({
       $or: [
         { fromUserId, toUserId },
@@ -17,7 +24,7 @@ requestRouter.post("/request/send/:status/:id", userAuth, async (req, res) => {
       ],
     });
     if (existingConnectionRequest) {
-      res.status(400).send("Connection request already exist");
+      return res.status(400).send("Connection request already exist");
     }
 
     // console.log(fromUserId, toUserId, status);
