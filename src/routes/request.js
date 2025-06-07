@@ -64,7 +64,7 @@ requestRouter.post(
       status: "interested",
     });
 
-    console.log(connectionRequest);
+    // console.log(connectionRequest);
 
     if (!connectionRequest) {
       return res.status(400).send("Invalid Request Id ");
