@@ -22,7 +22,10 @@ authRouter.post("/login", async (req, res) => {
 
       // const token = "wdfetrnrgdiwsadfgtorefdvgtr";
       res.cookie("auth", jtoken);
-      res.send("Login successfull!!!!");
+      res.json({
+        message: "Login successful!!!!",
+        user,
+      });
     }
   } catch (err) {
     res.status(400).send("Error : " + err);
